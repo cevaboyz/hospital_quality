@@ -8,61 +8,50 @@ rankhospital <- function(state, outcome, num = "best")
 
     #30-day rate death rate 
 
-    sacredfart <- read.csv("outcome-of-care-measures.csv")  
-
+    sacredfart <- read.csv("outcome-of-care-measures.csv") 
     
-    
-    check = state %in% sacredfart$State
-    
-    if(check == FALSE)
-    {
-        stop("No such state")
-    }
+    if(!state %in% sacredfart$State)
+        stop(sprintf("No such state named %s", state))
 
-
-
-    outcomes <- c("heart attack", "heart failure", "pneumonia")
-
-    check2 = outcome %in% outcomes
-    
-    if(check2 == FALSE)
-    {
-        stop("No Korona in the databanks")
-    }
-
-
+    if(outcome == 'hearth attack')        
+        outcome <- 'Hospital.30.Day.Death..Mortality..Rates.from.Heart.Attack'
+    else if(outcome == 'hearth failure')        
+        outcome <- 'Hospital.30.Day.Death..Mortality..Rates.from.Heart.Failure'
+    else if(outcome == 'pneumonia')
+        outcome <- 'Hospital.30.Day.Death..Mortality..Rates.from.Pneumonia'
+    else
+        stop(sprintf("No outcome found for %s", outcome))
 
     numvals <- c("best", "worst", 1:length(sacredfart$State))
 
-    check3 = num %in% numvals
+    if(!num %in% numvals)
+        stop("Invalid Rank %s", num)
 
-    if(check3 == FALSE)
-    {
-        stop("Invalid Rank")
-    }
-
-
-
-    if(outcome == 'hearth attack')
-        
-        outcome <- 'Hospital.30.Day.Death..Mortality..Rates.from.Heart.Attack'
     
-    else if(outcome == 'hearth failure')
+    onlystate <-sacredfart [ which(sacredfart$State == state), ]
+
+    result <- onlystate[order(onlystate[[outcome]], na.last = NA, decreasing = TRUE),]
+
+    print(result) 
+    # final <- onlystate[order(onlystate[outcome],na.last = TRUE, decreasing = FALSE),]
+
+    # print(onlystate[order(onlystate[outcome],na.last = NA, decreasing = TRUE),][outcome])
+
+    
+    # if(num == "best")
+    #     num <- 1
+    # else if (num == "worst")
+    #     num <- nrow(final)
         
-        outcome <- 'Hospital.30.Day.Death..Mortality..Rates.from.Heart.Failure'
-     
-     else 
-     outcome <- 'Hospital.30.Day.Death..Mortality..Rates.from.Pneumonia'
+    # return(final$Hospital.Name[num])
 
-onlystate <-sacredfart [ which(sacredfart$State == state), ]
+    # # onlystate$Rank <- NA
 
-onlystate$Rank <- NA
+    # # onlystate$Rank[order(onlystate$outcome)]<- nrow(onlystate)
 
-onlystate$Rank[order(onlystate$outcome)]<- nrow(onlystate)
+    # # final <- onlystate
 
-final <- onlystate
-
-return(head(final[1,2]))
-
+    # return(head(final[1,2]))
 
 }
+print(rankhospital("TX", "hearth failure", 4));
