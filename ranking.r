@@ -28,30 +28,26 @@ rankhospital <- function(state, outcome, num = "best")
         stop("Invalid Rank %s", num)
 
     
-    onlystate <-sacredfart [ which(sacredfart$State == state), ]
+    onlystate <-sacredfart [ which(sacredfart$State == state ), ]
 
-    result <- onlystate[order(onlystate[[outcome]], na.last = NA, decreasing = TRUE),]
+    onlystate <- onlystate[!is.na(onlystate[outcome]),]   ##THIS SHIT IS NOT WORKING FUCK 
 
-    print(result) 
-    # final <- onlystate[order(onlystate[outcome],na.last = TRUE, decreasing = FALSE),]
+    # print(class(onlystate[[outcome]][1]))
+    
+    onlystate[outcome]<- lapply(onlystate[outcome], as.numeric)  ##THIS IS VERY IMPORTANT
 
-    # print(onlystate[order(onlystate[outcome],na.last = NA, decreasing = TRUE),][outcome])
+    # xd<-onlystate[[outcome]][1]
+    # print(class(xd))
+
+    result <- onlystate[order(onlystate[outcome],onlystate$Hospital.Name, na.last = NA, decreasing = FALSE),]
 
     
-    # if(num == "best")
-    #     num <- 1
-    # else if (num == "worst")
-    #     num <- nrow(final)
+    if(num == "best")
+        num <- 1
+    else if (num == "worst")
+        num <- nrow(result)
         
-    # return(final$Hospital.Name[num])
-
-    # # onlystate$Rank <- NA
-
-    # # onlystate$Rank[order(onlystate$outcome)]<- nrow(onlystate)
-
-    # # final <- onlystate
-
-    # return(head(final[1,2]))
+    return(result$Hospital.Name[num])
 
 }
-print(rankhospital("TX", "hearth failure", 4));
+print(rankhospital("MD", "hearth attack", "worst"));
